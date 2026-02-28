@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minepyt"
+version = "0.1.0"
+description = "Python Minecraft bot library for 1.21.4 (mineflayer port)"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Anton Usov", email = ""}
+]
+keywords = ["minecraft", "bot", "mineflayer", "protocol", "1.21.4"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "mcproto>=0.0.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/AntonUsov/minepyt"
+Repository = "https://github.com/AntonUsov/minepyt.git"
+Issues = "https://github.com/AntonUsov/minepyt/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["minepyt*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501", "E722", "F401", "F841"]
