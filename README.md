@@ -78,6 +78,37 @@ A Python implementation of the [mineflayer](https://github.com/PrismarineJS/mine
 - **Trade Execution** - Execute villager trades with item management
 - **Trade Discovery** - View available trades and their conditions
 - **Price Calculation** - Dynamic pricing based on demand and reputation
+- **Price Calculation** - Dynamic pricing based on demand and reputation
+
+### Tablist Tracking
+- **Player List** - Track all players in TAB list
+- **Header/Footer** - Track tablist header and footer text
+- **Player Updates** - Player info updates (name, ping, gamemode)
+
+### Title Tracking
+- **Title/Subtitle** - Track title and subtitle on screen
+- **Action Bar** - Track action bar text
+- **Title Times** - Fade in, stay, fade out times
+- **Clear Events** - Title clear events
+
+### Team Tracking
+- **Team Management** - Track team create, update, remove
+- **Team Members** - Track team members (join/leave)
+- **Team Properties** - Friendly fire, collision, visibility, formatting
+
+### Particle Tracking
+- **Particle Events** - Track all particles from server
+- **Particle Data** - Particle ID, position, long-distance visibility
+
+### Sound Tracking
+- **Sound Effect Events** - Track all sounds from server
+- **Sound Data** - Sound ID/name, position, volume, pitch
+
+### Book Editing
+- **Book Reading** - Read book contents from inventory
+- **Book Writing** - Edit books (pages, title, author)
+- **Book Signing** - Sign books to prevent further editing
+
 ## Installation
 
 ```bash
@@ -422,6 +453,14 @@ await villager_window.close()
 | Entity Interaction | 100% |
 | Boss Bar Tracking | 100% |
 | Scoreboard Tracking | 100% |
+| Tablist Tracking | 100% |
+| Title Tracking | 100% |
+| Team Tracking | 100% |
+| Particle Tracking | 100% |
+| Sound Tracking | 100% |
+| Book Editing | 100% |
+
+**Overall: 100%** ✅
 
 **Overall: 100%** ✅
 

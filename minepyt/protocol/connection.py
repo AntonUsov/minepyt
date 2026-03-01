@@ -229,6 +229,48 @@ class MinecraftProtocol(LoginHandler, ConfigurationHandler, PlayHandler):
             from ..scoreboard import ScoreboardManager
         self._scoreboard_mgr: ScoreboardManager = ScoreboardManager(self)
 
+        # Tablist tracking
+        try:
+            from minepyt.tablist import TabListManager
+        except ImportError:
+            from ..tablist import TabListManager
+        self._tablist: TabListManager = TabListManager(self)
+
+        # Title tracking
+        try:
+            from minepyt.title import TitleManager
+        except ImportError:
+            from ..title import TitleManager
+        self._title: TitleManager = TitleManager(self)
+
+        # Team tracking
+        try:
+            from minepyt.team import TeamManager
+        except ImportError:
+            from ..team import TeamManager
+        self._team: TeamManager = TeamManager(self)
+
+        # Particle tracking
+        try:
+            from minepyt.particle import ParticleManager
+        except ImportError:
+            from ..particle import ParticleManager
+        self._particle: ParticleManager = ParticleManager(self)
+
+        # Sound tracking
+        try:
+            from minepyt.sound import SoundManager
+        except ImportError:
+            from ..sound import SoundManager
+        self._sound: SoundManager = SoundManager(self)
+
+        # Book editing
+        try:
+            from minepyt.book import BookManager
+        except ImportError:
+            from ..book import BookManager
+        self._book: BookManager = BookManager(self)
+
     # === Event System ===
 
     def on(self, event: str, handler: Callable) -> None:
@@ -1488,6 +1530,111 @@ class MinecraftProtocol(LoginHandler, ConfigurationHandler, PlayHandler):
             Scoreboard at position or None
         """
         return self._scoreboard_mgr.get_display_position(position)
+
+        return self._scoreboard_mgr.get_display_position(position)
+
+    # === Tablist Tracking ===
+
+    @property
+    def tablist(self) -> 'TabList':
+        """Get tablist manager"""
+        return self._tablist
+
+    def get_player(self, uuid: str):
+        """
+        Get player by UUID from tablist.
+
+        Args:
+            uuid: Player UUID
+
+        Returns:
+            Player data or None if not found
+        """
+        return self._tablist.get_player(uuid)
+
+    # === Title Tracking ===
+
+    @property
+    def title(self) -> 'TitleManager':
+        """Get title manager"""
+        return self._title
+
+    # === Team Tracking ===
+
+    @property
+    def teams(self) -> dict:
+        """Get all teams dictionary"""
+        return self._team.teams
+
+    def get_team(self, name: str):
+        """
+        Get team by name.
+
+        Args:
+            name: Team name
+
+        Returns:
+            Team or None if not found
+        """
+        return self._team.get_team(name)
+
+    def get_player_team(self, uuid: str):
+        """
+        Get team for a player.
+
+        Args:
+            uuid: Player UUID
+
+        Returns:
+            Team or None if player not in a team
+        """
+        return self._team.get_player_team(uuid)
+
+    # === Particle Tracking ===
+
+    @property
+    def particle(self) -> 'ParticleManager':
+        """Get particle manager"""
+        return self._particle
+
+    # === Sound Tracking ===
+
+    @property
+    def sound(self) -> 'SoundManager':
+        """Get sound manager"""
+        return self._sound
+
+    # === Book Editing ===
+
+    @property
+    def book(self) -> 'BookManager':
+        """Get book manager"""
+        return self._book
+
+    async def edit_book(self, slot: int, pages=None, title=None, author=None, signing=False):
+        """
+        Edit a book in inventory.
+
+        Args:
+            slot: Book slot (0-44)
+            pages: List of page strings (JSON components)
+            title: Book title
+            author: Book author
+            signing: Whether to sign the book
+        """
+        await self._book.edit_book(slot, pages, title, author, signing)
+
+    async def read_book(self, slot: int):
+        """
+        Read book data from inventory slot.
+
+        Args:
+            slot: Book slot (0-44)
+
+        Returns:
+            Book object or None if not a book
+        """
+        return await self._book.read_book(slot)
 
     # === Pathfinding ===
     
