@@ -1069,3 +1069,545 @@ asyncio.run(main())
 ✅ **Выполнять долгосрочные задачи без прерывания**
 ✅ **Обрабатывать команды игрока мгновенно**
 ✅ **Масштабироваться добавлением новых акторов и слоёв**
+
+
+---
+
+## Future Enhancements (Запланированные улучшения)
+
+### 1. Machine Learning Layer (ML-слой прогнозирования)
+
+**Приоритет:** 🟢 Низкий (высокая сложность, высокая польза)
+
+**Описание:** Добавить слой ML между Tactical и Goal для предсказания поведения мобов и игроков.
+
+**Компоненты:**
+
+```
+Layer 3.5: PREDICTION
+├── MobBehaviorPredictor     # Предсказание траектории мобов
+├── PlayerMovementPredictor  # Предсказание движения игроков
+├── ArrowTrajectoryPredictor # Предсказание траектории стрел
+└── ExplosionTimingPredictor # Предсказание взрыва крипера
+```
+
+**Интерфейс:**
+
+```python
+class PredictionLayer:
+    """
+    ML-слой прогнозирования.
+    Предсказывает будущее состояние мира на основе истории.
+    """
+    
+    def __init__(self):
+        self.mob_models: Dict[str, MobModel] = {}
+        self.player_models: Dict[str, PlayerModel] = {}
+        self.history_window = 100  # тиков истории для анализа
+    
+    def predict_mob_trajectory(self, mob: Entity, ticks: int = 20) -> List[Position]:
+        """Предсказать позицию моба через N тиков"""
+        pass
+    
+    def predict_player_action(self, player: Entity) -> PlayerAction:
+        """Предсказать следующее действие игрока"""
+        pass
+    
+    def predict_arrow_hit(self, arrow: Entity) -> Optional[Position]:
+        """Предсказать попадание стрелы"""
+        pass
+    
+    def get_prediction_vector(self) -> MovementVector:
+        """Вернуть вектор уклонения на основе предсказаний"""
+        pass
+```
+
+**Польза:**
+- Бот уклоняется от стрел ДО выстрела скелета
+- Бот убегает от крипера до взрыва
+- Бот предсказывает движение игрока для перехвата
+
+**Файлы:**
+- `minepyt/ai/prediction/__init__.py`
+- `minepyt/ai/prediction/mob_predictor.py`
+- `minepyt/ai/prediction/player_predictor.py`
+- `minepyt/ai/prediction/projectile_predictor.py`
+
+---
+
+### 2. Risk Assessment Module (Модуль оценки рисков)
+
+**Приоритет:** 🟡 Средний
+
+**Описание:** Отдельный модуль для количественной оценки риска каждого действия.
+
+**Компоненты:**
+
+```
+RiskAssessor
+├── ThreatEvaluator      # Оценка угроз
+├── EnvironmentAnalyzer  # Анализ окружения
+├── ResourceCalculator   # Расчёт стоимости ресурсов
+└── SurvivalProbability  # Вероятность выживания
+```
+
+**Интерфейс:**
+
+```python
+@dataclass
+class RiskReport:
+    """Отчёт о риске действия"""
+    action: Action
+    death_probability: float      # 0.0 - 1.0
+    resource_cost: int            # потеря ресурсов
+    time_cost: float              # время в секундах
+    reputation_impact: float      # влияние на репутацию
+    alternatives: List[Action]    # более безопасные альтернативы
+    recommended: bool             # рекомендуется ли это действие
+
+class RiskAssessor:
+    """
+    Модуль оценки рисков.
+    Анализирует каждое действие перед выполнением.
+    """
+    
+    def __init__(self, bot):
+        self.bot = bot
+        self.risk_threshold = 0.5  # максимальный допустимый риск
+    
+    def assess_action(self, action: Action) -> RiskReport:
+        """Оценить риск конкретного действия"""
+        death_prob = self._calculate_death_probability(action)
+        resource_cost = self._calculate_resource_cost(action)
+        alternatives = self._find_safer_alternatives(action)
+        
+        return RiskReport(
+            action=action,
+            death_probability=death_prob,
+            resource_cost=resource_cost,
+            time_cost=action.estimated_time,
+            reputation_impact=self._calculate_reputation_impact(action),
+            alternatives=alternatives,
+            recommended=death_prob < self.risk_threshold
+        )
+    
+    def assess_position(self, position: Position) -> PositionRisk:
+        """Оценить опасность позиции"""
+        threats = self._scan_threats(position)
+        escape_routes = self._find_escape_routes(position)
+        cover_available = self._check_cover(position)
+        
+        return PositionRisk(
+            position=position,
+            threat_level=sum(t.danger for t in threats),
+            escape_routes=escape_routes,
+            cover_available=cover_available
+        )
+    
+    def should_flee(self) -> bool:
+        """Нужно ли убегать?"""
+        return self._current_danger > self.flee_threshold
+```
+
+**Польза:**
+- Бот не лезет в ситуации с >50% вероятностью смерти
+- Автоматический поиск более безопасных альтернатив
+- Количественная оценка для принятия решений
+
+**Файлы:**
+- `minepyt/ai/risk/__init__.py`
+- `minepyt/ai/risk/assessor.py`
+- `minepyt/ai/risk/threats.py`
+- `minepyt/ai/risk/environment.py`
+
+---
+
+### 3. Inter-Bot Communication Protocol (Протокол связи ботов)
+
+**Приоритет:** 🟢 Низкий
+
+**Описание:** Протокол для координации нескольких ботов.
+
+**Компоненты:**
+
+```
+BotCommunication
+├── MessageRouter       # Маршрутизация сообщений
+├── ChannelManager      # Управление каналами
+├── EncryptionLayer     # Шифрование (опционально)
+└── ProtocolHandler     # Обработка протокола
+```
+
+**Типы сообщений:**
+
+```python
+class BotMessageType(Enum):
+    # Координация
+    NEED_HELP = "need_help"           # Запрос помощи
+    RESOURCE_FOUND = "resource_found" # Найден ресурс
+    DANGER_ZONE = "danger_zone"       # Опасная зона
+    TASK_STATUS = "task_status"       # Статус задачи
+    
+    # Ролевая система
+    ROLE_ASSIGNMENT = "role"          # Назначение роли
+    FORMATION = "formation"           # Построение
+    
+    # Торговля
+    TRADE_REQUEST = "trade"           # Запрос обмена
+    ITEM_TRANSFER = "item_transfer"   # Передача предметов
+
+class BotMessage:
+    sender_id: str
+    message_type: BotMessageType
+    priority: int  # 0=низкий, 1=нормальный, 2=высокий, 3=критический
+    data: Dict[str, Any]
+    timestamp: float
+    expires_at: Optional[float]
+```
+
+**Интерфейс:**
+
+```python
+class BotCommunication:
+    """
+    Система связи между ботами.
+    Поддерживает чат и WebSocket.
+    """
+    
+    def __init__(self, bot, encryption_key: Optional[str] = None):
+        self.bot = bot
+        self.encryption_key = encryption_key
+        self.known_bots: Dict[str, BotInfo] = {}
+        self.message_handlers: Dict[BotMessageType, Callable] = {}
+    
+    async def broadcast(self, message: BotMessage):
+        """Широковещательная рассылка всем ботам"""
+        if self.encryption_key:
+            message = self._encrypt(message)
+        await self._send_chat(message)
+    
+    async def send_to(self, bot_id: str, message: BotMessage):
+        """Отправить конкретному боту"""
+        pass
+    
+    async def request_help(self, position: Position, threat_type: str):
+        """Запросить помощь"""
+        message = BotMessage(
+            sender_id=self.bot.username,
+            message_type=BotMessageType.NEED_HELP,
+            priority=3,  # критический
+            data={
+                "position": position,
+                "threat": threat_type,
+                "urgency": "high"
+            }
+        )
+        await self.broadcast(message)
+    
+    def on_message(self, msg_type: BotMessageType):
+        """Декоратор для обработки сообщений"""
+        def decorator(func):
+            self.message_handlers[msg_type] = func
+            return func
+        return decorator
+```
+
+**Пример использования:**
+
+```python
+# Бот 1 обнаружил крипер
+await comm.request_help(bot.position, "creeper")
+
+# Бот 2 обрабатывает
+@comm.on_message(BotMessageType.NEED_HELP)
+async def handle_help(message: BotMessage):
+    if message.data["threat"] == "creeper":
+        await bot.goto(message.data["position"])
+        await attack_creeper()
+```
+
+**Файлы:**
+- `minepyt/ai/communication/__init__.py`
+- `minepyt/ai/communication/protocol.py`
+- `minepyt/ai/communication/router.py`
+- `minepyt/ai/communication/encryption.py`
+
+---
+
+### 4. Visual Debugging System (Система визуальной отладки)
+
+**Приоритет:** 🟡 Средний
+
+**Описание:** Визуализация в реальном времени того, что "видит" и "думает" бот.
+
+**Компоненты:**
+
+```
+DebugVisualizer
+├── WebSocketServer     # Сервер для веб-интерфейса
+├── StateSerializer     # Сериализация состояния
+├── HistoryRecorder     # Запись истории
+└── ReplaySystem        # Система повторов
+```
+
+**Интерфейс:**
+
+```python
+class DebugVisualizer:
+    """
+    Система визуальной отладки.
+    WebSocket сервер для веб-интерфейса.
+    """
+    
+    def __init__(self, bot, port: int = 8080):
+        self.bot = bot
+        self.port = port
+        self.clients: Set[WebSocket] = set()
+        self.history: List[DebugSnapshot] = []
+        self.max_history = 10000
+    
+    async def start(self):
+        """Запустить сервер отладки"""
+        await websockets.serve(self._handle_client, "localhost", self.port)
+    
+    async def broadcast_state(self):
+        """Отправить текущее состояние всем клиентам"""
+        snapshot = self._create_snapshot()
+        self.history.append(snapshot)
+        
+        if len(self.history) > self.max_history:
+            self.history.pop(0)
+        
+        for client in self.clients:
+            await client.send(json.dumps(snapshot))
+    
+    def _create_snapshot(self) -> DebugSnapshot:
+        """Создать снимок состояния"""
+        return {
+            "timestamp": time.time(),
+            "position": self.bot.position,
+            "health": self.bot.health,
+            "food": self.bot.food,
+            
+            # Векторы движения
+            "vectors": {
+                "goal": self.bot.ai.movement.goal_vector,
+                "tactical": self.bot.ai.movement.tactical_vector,
+                "avoid": self.bot.ai.movement.avoid_vector,
+                "physics": self.bot.ai.movement.physics_vector,
+                "final": self.bot.ai.movement.final_vector,
+            },
+            
+            # Угрозы
+            "threats": [
+                {"type": t.type, "position": t.position, "danger": t.danger}
+                for t in self.bot.ai.sensors.threats
+            ],
+            
+            # Интересы
+            "interests": [
+                {"type": i.type, "position": i.position, "priority": i.priority}
+                for i in self.bot.ai.sensors.interests
+            ],
+            
+            # Текущая цель
+            "goal": {
+                "type": self.bot.ai.movement.goal_type,
+                "target": self.bot.ai.movement.goal_entity,
+            },
+            
+            # Решения
+            "decisions": self.bot.ai.decision_history[-10:],
+        }
+```
+
+**Веб-интерфейс показывает:**
+- 3D карта с позицией бота
+- Векторы движения (все слои)
+- Обнаруженные угрозы (красные маркеры)
+- Интересные объекты (зелёные маркеры)
+- Текущую цель (жёлтый маркер)
+- История решений (timeline)
+- Графики health/food/overtime
+
+**Файлы:**
+- `minepyt/ai/debug/__init__.py`
+- `minepyt/ai/debug/visualizer.py`
+- `minepyt/ai/debug/web_interface/` (HTML/JS)
+
+---
+
+### 5. Hierarchical Task Network (HTN) для сложных задач
+
+**Приоритет:** 🟢 Низкий
+
+**Описание:** HTN планировщик для многошаговых задач с автоматической декомпозицией.
+
+**Компоненты:**
+
+```
+HTNPlanner
+├── TaskDecomposer      # Декомпозиция задач
+├── MethodSelector      # Выбор методов
+├── PreconditionChecker # Проверка условий
+└── PlanExecutor        # Исполнение плана
+```
+
+**Структура:**
+
+```python
+class TaskType(Enum):
+    PRIMITIVE = "primitive"  # Атомарное действие
+    COMPOUND = "compound"    # Составная задача
+
+@dataclass
+class HTNTask:
+    name: str
+    task_type: TaskType
+    preconditions: List[Condition]
+    effects: List[Effect]
+    
+    # Для compound задач
+    methods: List['HTNMethod'] = field(default_factory=list)
+    
+    # Для primitive задач
+    action: Optional[Callable] = None
+
+@dataclass
+class HTNMethod:
+    name: str
+    preconditions: List[Condition]
+    subtasks: List[HTNTask]
+
+class HTNPlanner:
+    """
+    HTN планировщик.
+    Декомпозирует сложные задачи на простые действия.
+    """
+    
+    def __init__(self, bot):
+        self.bot = bot
+        self.task_library: Dict[str, HTNTask] = {}
+        self._register_default_tasks()
+    
+    def decompose(self, task: HTNTask, state: WorldState) -> List[HTNTask]:
+        """
+        Рекурсивная декомпозиция задачи.
+        Возвращает список примитивных действий.
+        """
+        if task.task_type == TaskType.PRIMITIVE:
+            return [task]
+        
+        # Выбрать подходящий метод
+        method = self._select_method(task, state)
+        if not method:
+            raise PlanningError(f"No applicable method for {task.name}")
+        
+        # Рекурсивно декомпозировать подзадачи
+        result = []
+        for subtask in method.subtasks:
+            result.extend(self.decompose(subtask, state))
+        
+        return result
+    
+    def plan(self, goal: str) -> List[HTNTask]:
+        """Создать план для достижения цели"""
+        task = self.task_library[goal]
+        state = self._get_current_state()
+        return self.decompose(task, state)
+    
+    def _register_default_tasks(self):
+        """Регистрация стандартных задач"""
+        
+        # "Построить дом" → составная задача
+        self.task_library["build_house"] = HTNTask(
+            name="build_house",
+            task_type=TaskType.COMPOUND,
+            methods=[
+                HTNMethod(
+                    name="standard_house",
+                    preconditions=[HasResources()], HasSpace()],
+                    subtasks=[
+                        HTNTask(name="gather_materials"),
+                        HTNTask(name="clear_area"),
+                        HTNTask(name="build_foundation"),
+                        HTNTask(name="build_walls"),
+                        HTNTask(name="build_roof"),
+                        HTNTask(name="add_doors_windows"),
+                    ]
+                )
+            ]
+        )
+        
+        # "Собрать материалы" → составная задача
+        self.task_library["gather_materials"] = HTNTask(
+            name="gather_materials",
+            task_type=TaskType.COMPOUND,
+            methods=[
+                HTNMethod(
+                    name="wooden_house",
+                    preconditions=[],
+                    subtasks=[
+                        HTNTask(name="find_tree"),
+                        HTNTask(name="chop_tree"),
+                        HTNTask(name="craft_planks"),
+                    ]
+                )
+            ]
+        )
+        
+        # Примитивные задачи
+        self.task_library["find_tree"] = HTNTask(
+            name="find_tree",
+            task_type=TaskType.PRIMITIVE,
+            action=lambda: self.bot.find_nearest("minecraft:oak_log")
+        )
+```
+
+**Пример использования:**
+
+```python
+# Создать план "построить дом"
+planner = HTNPlanner(bot)
+plan = planner.plan("build_house")
+
+# План автоматически разложится на:
+# 1. find_tree
+# 2. chop_tree
+# 3. craft_planks
+# 4. clear_area
+# 5. build_foundation
+# 6. build_walls
+# 7. build_roof
+# 8. add_doors_windows
+
+# Выполнить план
+for task in plan:
+    await task.action()
+```
+
+**Файлы:**
+- `minepyt/ai/htn/__init__.py`
+- `minepyt/ai/htn/planner.py`
+- `minepyt/ai/htn/tasks.py`
+- `minepyt/ai/htn/methods.py`
+- `minepyt/ai/htn/world_state.py`
+
+---
+
+## Приоритет реализации Future Enhancements
+
+| Фаза | Идея | Сложность | Польза | ETA |
+|------|------|-----------|--------|-----|
+| Фаза 7 | Visual Debugging | 🟡 Средняя | 🔴 Высокая | 2-3 дня |
+| Фаза 7 | Risk Assessment | 🟡 Средняя | 🟡 Средняя | 2-3 дня |
+| Фаза 8 | Inter-Bot Comm | 🟡 Средняя | 🟡 Средняя | 3-5 дней |
+| Фаза 9 | HTN Planner | 🔴 Высокая | 🔴 Высокая | 5-7 дней |
+| Фаза 10 | ML Layer | 🔴 Высокая | 🔴 Высокая | 7-14 дней |
+
+**Рекомендуемый порядок:**
+1. Visual Debugging — упростит отладку всех остальных
+2. Risk Assessment — улучшит базовое поведение
+3. Inter-Bot Comm — для координации ботов
+4. HTN Planner — для сложных задач
+5. ML Layer — для продвинутого ИИ
