@@ -271,6 +271,90 @@ class MinecraftProtocol(LoginHandler, ConfigurationHandler, PlayHandler):
             from ..book import BookManager
         self._book: BookManager = BookManager(self)
 
+        # Bed tracking system
+        try:
+            from minepyt.bed import BedManager
+        except ImportError:
+            from ..bed import BedManager
+        self._bed_mgr: BedManager = BedManager(self)
+
+        # Kick disconnect system
+        try:
+            from minepyt.kick import KickManager
+        except ImportError:
+            from ..kick import KickManager
+        self._kick: KickManager = KickManager(self)
+
+        # Explosion tracking system
+        try:
+            from minepyt.explosion import ExplosionManager
+        except ImportError:
+            from ..explosion import ExplosionManager
+        self._explosion: ExplosionManager = ExplosionManager(self)
+
+        # Fishing system
+        try:
+            from minepyt.fishing import FishingManager
+        except ImportError:
+            from ..fishing import FishingManager
+        self._fishing: FishingManager = FishingManager(self)
+
+        # Weather (rain) tracking system
+        try:
+            from minepyt.rain import WeatherManager
+        except ImportError:
+            from ..rain import WeatherManager
+        self._weather: WeatherManager = WeatherManager(self)
+
+        # Resource pack tracking system
+        try:
+            from minepyt.resource_pack import ResourcePackManager
+        except ImportError:
+            from ..resource_pack import ResourcePackManager
+        self._resource_pack: ResourcePackManager = ResourcePackManager(self)
+
+        # Client settings system
+        try:
+            from minepyt.settings import SettingsManager
+        except ImportError:
+            from ..settings import SettingsManager
+        self._settings: SettingsManager = SettingsManager(self)
+
+        # Spawn point tracking system
+        try:
+            from minepyt.spawn_point import SpawnPointManager
+        except ImportError:
+            from ..spawn_point import SpawnPointManager
+        self._spawn_point: SpawnPointManager = SpawnPointManager(self)
+
+        # Time tracking system
+        try:
+            from minepyt.time import TimeManager
+        except ImportError:
+            from ..time import TimeManager
+        self._time_mgr: TimeManager = TimeManager(self)
+
+        # Experience tracking system
+        try:
+            from minepyt.experience import ExperienceManager
+        except ImportError:
+            from ..experience import ExperienceManager
+        self._experience: ExperienceManager = ExperienceManager(self)
+
+        # Game state tracking system
+        try:
+            from minepyt.game import GameStateManager
+        except ImportError:
+            from ..game import GameStateManager
+        self._game_state: GameStateManager = GameStateManager(self)
+
+        # Ray tracing system
+        try:
+            from minepyt.ray_trace import RayTraceManager
+        except ImportError:
+            from ..ray_trace import RayTraceManager
+        self._ray_trace: RayTraceManager = RayTraceManager(self)
+
     # === Event System ===
 
     def on(self, event: str, handler: Callable) -> None:
@@ -1604,6 +1688,77 @@ class MinecraftProtocol(LoginHandler, ConfigurationHandler, PlayHandler):
         """Get sound manager"""
         return self._sound
 
+    # === Bed Tracking ===
+    @property
+    def bed(self) -> 'BedManager':
+        """Get bed manager"""
+        return self._bed_mgr
+
+    # === Kick Tracking ===
+    @property
+    def kick_manager(self) -> 'KickManager':
+        """Get kick manager"""
+        return self._kick
+
+    # === Explosion Tracking ===
+    @property
+    def explosion_manager(self) -> 'ExplosionManager':
+        """Get explosion manager"""
+        return self._explosion
+
+    # === Fishing ===
+    @property
+    def fishing(self) -> 'FishingManager':
+        """Get fishing manager"""
+        return self._fishing
+
+    # === Weather Tracking ===
+    @property
+    def weather(self) -> 'WeatherManager':
+        """Get weather manager"""
+        return self._weather
+
+    # === Resource Pack Tracking ===
+    @property
+    def resource_pack(self) -> 'ResourcePackManager':
+        """Get resource pack manager"""
+        return self._resource_pack
+
+    # === Settings Tracking ===
+    @property
+    def client_settings(self) -> 'SettingsManager':
+        """Get client settings manager"""
+        return self._settings
+
+    # === Spawn Point Tracking ===
+    @property
+    def spawn_point(self) -> 'SpawnPointManager':
+        """Get spawn point manager"""
+        return self._spawn_point
+
+    # === Time Tracking ===
+    @property
+    def game_time(self) -> 'TimeManager':
+        """Get game time manager"""
+        return self._time_mgr
+
+    # === Experience Tracking ===
+    @property
+    def experience(self) -> 'ExperienceManager':
+        """Get experience manager"""
+        return self._experience
+
+    # === Game State Tracking ===
+    @property
+    def game_state(self) -> 'GameStateManager':
+        """Get game state manager"""
+        return self._game_state
+
+    # === Ray Trace Tracking ===
+    @property
+    def ray_trace(self) -> 'RayTraceManager':
+        """Get ray trace manager"""
+        return self._ray_trace
     # === Book Editing ===
 
     @property
