@@ -682,3 +682,637 @@ asyncio.run(main())
 ✅ **Выполнять долгосрочные задачи без прерывания**
 ✅ **Обрабатывать команды игрока мгновенно**
 ✅ **Масштабироваться добавлением новых акторов и слоёв**
+
+---
+
+## Future Enhancements
+
+### Обзор будущих улучшений
+
+Этот раздел описывает планируемые расширения архитектуры AI системы.
+
+### Приоритеты реализации
+
+1. **Visual Debugging** (Фаза 7, Средняя) - упростит отладку и разработку
+2. **Risk Assessment** (Фаза 7, Средняя) - улучшит поведение бота
+3. **Inter-Bot Communication** (Фаза 8, Средняя) - координация ботов
+4. **HTN Planner** (Фаза 9, Высокая) - сложные иерархические задачи
+5. **ML Prediction Layer** (Фаза 10, Высокая) - продвинутый ИИ с машинным обучением
+
+---
+
+### 4. Visual Debugging System (Flask)
+
+**Фаза:** 7  
+**Приоритет:** Средний  
+**Сложность:** Средняя  
+**Время реализации:** ~16 часов
+
+#### Назначение
+
+Веб-интерфейс для визуализации работы AI системы бота в реальном времени. Позволяет видеть:
+- Состояние всех слоёв движения
+- Данные сенсоров
+- Позицию бота на карте
+- Логи событий
+- Производительность
+
+#### Архитектура
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Flask Debug Server                     │
+│                    (minepyt/ai/debug/)                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │               WebSocket Real-time API                    │  │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐         │  │
+│  │  │ Sensors  │  │Movement  │  │Events    │         │  │
+│  │  │ Stream   │  │Stream    │  │Stream    │         │  │
+│  │  └──────────┘  └──────────┘  └──────────┘         │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                           │                                     │
+│  ┌──────────────────────────▼───────────────────────────────────┐  │
+│  │              REST API (Query State)                         │  │
+│  │  GET  /api/state      - Полное состояние бота                │  │
+│  │  GET  /api/layers     - Состояние слоёв движения             │  │
+│  │  GET  /api/sensors    - Данные сенсоров                     │  │
+│  │  GET  /api/logs       - Логи событий                        │  │
+│  │  GET  /api/perf       - Производительность                  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                           │                                     │
+│  ┌──────────────────────────▼───────────────────────────────────┐  │
+│  │              Static Web UI (HTML/JS)                         │  │
+│  │  /               - Главная страница                         │  │
+│  │  /map            - Карта местности                          │  │
+│  │  /layers         - Визуализация слоёв                       │  │
+│  │  /sensors        - Данные сенсоров                          │  │
+│  │  /logs           - Логи событий                            │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+                   ┌────────────────────┐
+                   │   Bot (SmartBot)   │
+                   └────────────────────┘
+```
+
+#### Структура файлов
+
+```
+minepyt/ai/debug/
+├── __init__.py
+├── app.py                    # Flask приложение
+├── socket_handler.py         # WebSocket обработчики
+├── api.py                    # REST API эндпоинты
+├── state_collector.py        # Сбор состояния с бота
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       ├── main.js
+│       ├── layers.js
+│       ├── map.js
+│       └── sensors.js
+└── templates/
+    ├── index.html            # Главная страница
+    ├── layers.html           # Визуализация слоёв
+    ├── map.html              # Карта
+    ├── sensors.html          # Данные сенсоров
+    └── logs.html             # Логи
+```
+
+#### API Интерфейсы
+
+##### WebSocket потоки
+
+```python
+# minepyt/ai/debug/socket_handler.py
+
+class WebSocketManager:
+    """Управление WebSocket подключениями"""
+    
+    async def broadcast_layers(self, state: Dict):
+        """Отправка состояния слоёв"""
+        await self.websocket.send_json({
+            "type": "layers_update",
+            "data": {
+                "layer4_goal": state.get("goal_vector"),
+                "layer3_tactical": state.get("tactical_vectors"),
+                "layer2_avoid": state.get("avoid_vectors"),
+                "layer1_physics": state.get("physics_vector"),
+                "final_vector": state.get("final_vector")
+            }
+        })
+    
+    async def broadcast_sensors(self, sensors: SensorArray):
+        """Отправка данных сенсоров"""
+        await self.websocket.send_json({
+            "type": "sensors_update",
+            "data": {
+                "threats": [self._serialize_threat(t) for t in sensors.threats],
+                "interests": [self._serialize_interest(i) for i in sensors.interests],
+                "terrain": sensors.terrain
+            }
+        })
+    
+    async def broadcast_position(self, x, y, z, yaw, pitch):
+        """Отправка позиции бота"""
+        await self.websocket.send_json({
+            "type": "position_update",
+            "data": {"x": x, "y": y, "z": z, "yaw": yaw, "pitch": pitch}
+        })
+    
+    async def broadcast_event(self, event_type: str, data: Dict):
+        """Отправка события"""
+        await self.websocket.send_json({
+            "type": "event",
+            "event_type": event_type,
+            "data": data,
+            "timestamp": time.time()
+        })
+```
+
+##### REST API
+
+```python
+# minepyt/ai/debug/api.py
+
+from flask import jsonify, request
+
+@app.route('/api/state')
+def get_state():
+    """Полное состояние бота"""
+    return jsonify({
+        "position": collector.get_position(),
+        "health": collector.get_health(),
+        "hunger": collector.get_hunger(),
+        "current_task": collector.get_current_task(),
+        "inventory": collector.get_inventory()
+    })
+
+@app.route('/api/layers')
+def get_layers():
+    """Состояние слоёв движения"""
+    return jsonify(collector.get_layers_state())
+
+@app.route('/api/sensors')
+def get_sensors():
+    """Данные сенсоров"""
+    return jsonify(collector.get_sensors_data())
+
+@app.route('/api/logs')
+def get_logs():
+    """Логи событий"""
+    limit = request.args.get('limit', 100, type=int)
+    return jsonify(collector.get_logs(limit))
+
+@app.route('/api/perf')
+def get_performance():
+    """Производительность"""
+    return jsonify(collector.get_performance_stats())
+```
+
+#### Сбор состояния с бота
+
+```python
+# minepyt/ai/debug/state_collector.py
+
+class StateCollector:
+    """Сбор состояния бота для визуализации"""
+    
+    def __init__(self, bot: SmartBot):
+        self.bot = bot
+        self.ws_manager: WebSocketManager = None
+        self.log_buffer: List[Dict] = []
+        self.max_log_size = 1000
+    
+    def set_websocket_manager(self, manager: WebSocketManager):
+        """Установить WebSocket менеджер"""
+        self.ws_manager = manager
+    
+    def on_layers_update(self, layer_state: Dict):
+        """Вызывается при обновлении слоёв"""
+        if self.ws_manager:
+            asyncio.create_task(self.ws_manager.broadcast_layers(layer_state))
+    
+    def on_sensors_update(self, sensors: SensorArray):
+        """Вызывается при обновлении сенсоров"""
+        if self.ws_manager:
+            asyncio.create_task(self.ws_manager.broadcast_sensors(sensors))
+    
+    def on_position_update(self, x, y, z, yaw, pitch):
+        """Вызывается при изменении позиции"""
+        if self.ws_manager:
+            asyncio.create_task(self.ws_manager.broadcast_position(x, y, z, yaw, pitch))
+    
+    def log_event(self, event_type: str, data: Dict):
+        """Записать событие"""
+        entry = {
+            "type": event_type,
+            "data": data,
+            "timestamp": time.time()
+        }
+        self.log_buffer.append(entry)
+        
+        # Лимит буфера
+        if len(self.log_buffer) > self.max_log_size:
+            self.log_buffer.pop(0)
+        
+        # Отправить по WebSocket
+        if self.ws_manager:
+            asyncio.create_task(self.ws_manager.broadcast_event(event_type, data))
+```
+
+#### Flask приложение
+
+```python
+# minepyt/ai/debug/app.py
+
+from flask import Flask, render_template
+from flask_socketio import SocketIO
+
+class DebugServer:
+    """Flask сервер для отладки"""
+    
+    def __init__(self, bot: SmartBot, host='0.0.0.0', port=5000):
+        self.bot = bot
+        self.host = host
+        self.port = port
+        
+        self.app = Flask(__name__, 
+                        template_folder='templates',
+                        static_folder='static')
+        self.socketio = SocketIO(self.app, cors_allowed_origins="*")
+        
+        self.state_collector = StateCollector(bot)
+        self.ws_manager = WebSocketManager()
+        self.state_collector.set_websocket_manager(self.ws_manager)
+        
+        self._setup_routes()
+        self._setup_socketio()
+    
+    def _setup_routes(self):
+        """Настройка роутов"""
+        
+        @self.app.route('/')
+        def index():
+            return render_template('index.html')
+        
+        @self.app.route('/layers')
+        def layers():
+            return render_template('layers.html')
+        
+        @self.app.route('/map')
+        def map_view():
+            return render_template('map.html')
+        
+        @self.app.route('/sensors')
+        def sensors():
+            return render_template('sensors.html')
+        
+        @self.app.route('/logs')
+        def logs():
+            return render_template('logs.html')
+    
+    def _setup_socketio(self):
+        """Настройка WebSocket"""
+        
+        @self.socketio.on('connect')
+        def handle_connect():
+            print(f"Client connected: {request.sid}")
+            # Отправить начальное состояние
+            self.socketio.emit('initial_state', self.state_collector.get_full_state())
+        
+        @self.socketio.on('disconnect')
+        def handle_disconnect():
+            print(f"Client disconnected: {request.sid}")
+    
+    def run(self, debug=True):
+        """Запустить сервер"""
+        print(f"Debug server running on http://{self.host}:{self.port}")
+        self.socketio.run(self.app, host=self.host, port=self.port, debug=debug)
+```
+
+#### Интеграция с SmartBot
+
+```python
+# minepyt/ai/__init__.py
+
+from .debug import DebugServer
+
+class SmartBot:
+    """Умный бот с AI"""
+    
+    def __init__(self, config):
+        # ... существующая инициализация ...
+        
+        # Debug сервер
+        self.debug_server = None
+        if config.get('debug_server', False):
+            self.debug_server = DebugServer(
+                self,
+                host=config.get('debug_host', '0.0.0.0'),
+                port=config.get('debug_port', 5000)
+            )
+    
+    def start_debug_server(self):
+        """Запустить debug сервер"""
+        if self.debug_server:
+            self.debug_server.run()
+```
+
+#### Визуализация слоёв (HTML/JS)
+
+```html
+<!-- minepyt/ai/debug/templates/layers.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movement Layers</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Movement Layers Visualization</h1>
+        
+        <div class="layers-container">
+            <div class="layer" id="layer4">
+                <h3>Layer 4: GOAL</h3>
+                <div class="vector-display" id="goal-vector"></div>
+            </div>
+            
+            <div class="layer" id="layer3">
+                <h3>Layer 3: TACTICAL</h3>
+                <div class="vector-list" id="tactical-vectors"></div>
+            </div>
+            
+            <div class="layer" id="layer2">
+                <h3>Layer 2: LOCAL_AVOID</h3>
+                <div class="vector-list" id="avoid-vectors"></div>
+            </div>
+            
+            <div class="layer" id="layer1">
+                <h3>Layer 1: PHYSICS</h3>
+                <div class="vector-display" id="physics-vector"></div>
+            </div>
+            
+            <div class="final-result" id="final-vector">
+                <h2>Final Vector</h2>
+                <div class="vector-display" id="final-vector-display"></div>
+            </div>
+        </div>
+        
+        <canvas id="vector-canvas" width="400" height="400"></canvas>
+    </div>
+    
+    <script src="/static/js/layers.js"></script>
+</body>
+</html>
+```
+
+```javascript
+// minepyt/ai/debug/static/js/layers.js
+
+const socket = io();
+const canvas = document.getElementById('vector-canvas');
+const ctx = canvas.getContext('2d');
+
+socket.on('layers_update', (data) => {
+    updateLayerDisplay('goal-vector', data.data.layer4_goal);
+    updateLayerDisplay('physics-vector', data.data.layer1_physics);
+    updateVectorList('tactical-vectors', data.data.layer3_tactical);
+    updateVectorList('avoid-vectors', data.data.layer2_avoid);
+    updateLayerDisplay('final-vector-display', data.data.final_vector);
+    
+    drawVectors(data.data);
+});
+
+function updateLayerDisplay(elementId, vector) {
+    const el = document.getElementById(elementId);
+    if (vector) {
+        el.textContent = `X: ${vector.dx.toFixed(3)}, Y: ${vector.dy.toFixed(3)}, Z: ${vector.dz.toFixed(3)}`;
+    }
+}
+
+function drawVectors(data) {
+    // Очистить canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const scale = 100;
+    
+    // Нарисовать все векторы
+    drawArrow(centerX, centerY, data.layer4_goal, '#00ff00', 'GOAL');
+    drawArrows(centerX, centerY, data.layer3_tactical, '#ffff00', 'TACTICAL');
+    drawArrows(centerX, centerY, data.layer2_avoid, '#ff0000', 'AVOID');
+    drawArrow(centerX, centerY, data.layer1_physics, '#00ffff', 'PHYSICS');
+    drawArrow(centerX, centerY, data.final_vector, '#ffffff', 'FINAL', 3);
+}
+
+function drawArrow(cx, cy, vector, color, label, width=2) {
+    if (!vector) return;
+    
+    const endX = cx + vector.dx * scale;
+    const endY = cy + vector.dz * scale;  // Используем dz как Y
+    
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+    
+    ctx.fillStyle = color;
+    ctx.font = '12px Arial';
+    ctx.fillText(label, endX + 5, endY);
+}
+```
+
+#### Пример использования
+
+```python
+from minepyt.ai import SmartBot
+
+async def main():
+    bot = await SmartBot({
+        "host": "localhost",
+        "port": 25565,
+        "username": "SmartBot",
+        "debug_server": True,   # Включить debug сервер
+        "debug_host": "0.0.0.0",
+        "debug_port": 5000
+    })
+    
+    # Запустить debug сервер в отдельном потоке
+    import threading
+    server_thread = threading.Thread(target=bot.start_debug_server)
+    server_thread.daemon = True
+    server_thread.start()
+    
+    # Бот работает
+    await bot.stay_alive(duration=300.0)
+
+asyncio.run(main())
+```
+
+#### Зависимости
+
+```
+Flask==3.0.0
+flask-socketio==5.3.6
+python-socketio==5.11.0
+```
+
+#### Этапы реализации
+
+1. **Базовый Flask сервер** (4 часа)
+   - Создать структуру файлов
+   - Настроить Flask приложение
+   - Базовые HTML шаблоны
+
+2. **WebSocket стриминг** (4 часа)
+   - WebSocket менеджер
+   - Интеграция с SmartBot
+   - Потоки данных (слои, сенсоры, позиция)
+
+3. **REST API** (2 часа)
+   - API эндпоинты
+   - StateCollector
+
+4. **Визуализация слоёв** (3 часа)
+   - Canvas отрисовка векторов
+   - Real-time обновления
+
+5. **Карта и сенсоры** (2 часа)
+   - 2D карта местности
+   - Отображение угроз и интересов
+
+6. **Логи и события** (1 час)
+   - Логирование событий
+   - Веб интерфейс логов
+
+---
+
+### 1. ML Prediction Layer
+
+**Фаза:** 10  
+**Приоритет:** Низкий  
+**Сложность:** Высокая  
+**Время реализации:** ~40 часов
+
+#### Назначение
+
+Использование машинного обучения для предсказания действий:
+- Поведение врагов
+- Оптимальные маршруты
+- Результаты действий
+
+#### Компоненты
+
+```
+MLPredictionLayer
+├── EnemyBehaviorPredictor    # Предсказание поведения врагов
+├── RouteOptimizer             # Оптимизация маршрутов
+├── ActionOutcomePredictor    # Предсказание результатов действий
+└── ModelTrainer              # Обучение моделей
+```
+
+---
+
+### 2. Risk Assessment Module
+
+**Фаза:** 7  
+**Приоритет:** Средний  
+**Сложность:** Средняя  
+**Время реализации:** ~20 часов
+
+#### Назначение
+
+Модуль оценки рисков для принятия решений:
+- Оценка угрозы
+- Расчет вероятности успеха
+- Выбор наименее рискованного действия
+
+#### Компоненты
+
+```
+RiskAssessor
+├── ThreatEvaluator           # Оценка угроз
+├── ProbabilityCalculator     # Расчет вероятностей
+└── RiskOptimizer             # Оптимизация по риску
+```
+
+---
+
+### 3. Inter-Bot Communication
+
+**Фаза:** 8  
+**Приоритет:** Средний  
+**Сложность:** Средняя  
+**Время реализации:** ~24 часа
+
+#### Назначение
+
+Координация нескольких ботов:
+- Обмен информацией
+- Распределение задач
+- Синхронизация действий
+
+#### Компоненты
+
+```
+BotNetwork
+├── DiscoveryProtocol         # Обнаружение ботов
+├── MessageBus                # Шина сообщений
+├── TaskDistributor          # Распределитель задач
+└── StateSynchronizer        # Синхронизация состояния
+```
+
+---
+
+### 5. HTN Planner
+
+**Фаза:** 9  
+**Приоритет:** Низкий  
+**Сложность:** Высокая  
+**Время реализации:** ~32 часа
+
+#### Назначение
+
+Hierarchical Task Network планировщик для сложных задач:
+- Иерархическое разложение задач
+- Методы (methods) для задач
+- Планирование с ограничениями
+
+#### Компоненты
+
+```
+HTNPlanner
+├── TaskDecomposer           # Разложение задач
+├── MethodSelector           # Выбор методов
+├── Planner                  # Планировщик
+└── HTNLibrary              # Библиотека задач и методов
+```
+
+---
+
+### Общий порядок реализации
+
+**Phase 7 (Immediate value):**
+1. Visual Debugging System → упростит отладку всех компонентов
+2. Risk Assessment Module → улучшит поведение в опасных ситуациях
+
+**Phase 8 (Coordination):**
+3. Inter-Bot Communication → координация ботов
+
+**Phase 9 (Advanced planning):**
+4. HTN Planner → сложные многошаговые задачи
+
+**Phase 10 (Advanced AI):**
+5. ML Prediction Layer → машинное обучение для предсказаний
+
