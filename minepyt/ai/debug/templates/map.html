@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map - MinePyt Debug</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🤖 MinePyt Debug</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/layers">Layers</a>
+            <a href="/sensors">Sensors</a>
+            <a href="/map" class="active">Map</a>
+            <a href="/logs">Logs</a>
+            <a href="/performance">Performance</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🗺 World Map</h1>
+            <p>2D карта местности с позицией бота</p>
+        </div>
+        
+        <div class="map-container">
+            <div class="map-controls">
+                <button id="zoom-in">+</button>
+                <button id="zoom-out">-</button>
+                <button id="center-bot">Center on Bot</button>
+                <button id="toggle-grid">Toggle Grid</button>
+                <select id="layer-select">
+                    <option value="all">All Layers</option>
+                    <option value="threats">Threats Only</option>
+                    <option value="interests">Interests Only</option>
+                    <option value="terrain">Terrain Only</option>
+                </select>
+            </div>
+            
+            <canvas id="map-canvas" width="800" height="600"></canvas>
+            
+            <div class="map-info">
+                <div class="info-item">
+                    <span class="label">Bot Position:</span>
+                    <span class="value" id="bot-pos">X: 0, Y: 0, Z: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Dimension:</span>
+                    <span class="value" id="dimension">Overworld</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Zoom:</span>
+                    <span class="value" id="zoom-level">1.0x</span>
+                </div>
+            </div>
+            
+            <div class="map-legend">
+                <div class="legend-item">
+                    <div class="legend-color bot"></div>
+                    <span>Bot</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color threat"></div>
+                    <span>Threat</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color interest"></div>
+                    <span>Interest</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color player"></div>
+                    <span>Player</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color hazard"></div>
+                    <span>Hazard</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="/static/js/map.js"></script>
+</body>
+</html>

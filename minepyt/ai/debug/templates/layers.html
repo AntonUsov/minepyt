@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movement Layers - MinePyt Debug</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🤖 MinePyt Debug</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/layers" class="active">Layers</a>
+            <a href="/sensors">Sensors</a>
+            <a href="/map">Map</a>
+            <a href="/logs">Logs</a>
+            <a href="/performance">Performance</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Movement Layers Visualization</h1>
+            <p>Real-time визуализация всех слоёв движения</p>
+        </div>
+        
+        <div class="layers-container">
+            <div class="canvas-section">
+                <canvas id="vector-canvas" width="600" height="600"></canvas>
+                <div class="canvas-controls">
+                    <button id="clear-canvas">Clear</button>
+                    <button id="toggle-grid">Toggle Grid</button>
+                </div>
+            </div>
+            
+            <div class="layers-details">
+                <div class="layer-card" id="layer4">
+                    <div class="layer-header">
+                        <h3>Layer 4: GOAL</h3>
+                        <span class="layer-weight">Weight: 0.5</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="vector-display" id="goal-vector">
+                            <div class="vector-coords">
+                                <span>X: <span id="goal-x">0.000</span></span>
+                                <span>Y: <span id="goal-y">0.000</span></span>
+                                <span>Z: <span id="goal-z">1.000</span></span>
+                            </div>
+                            <div class="vector-info" id="goal-info">Idle</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="layer-card" id="layer3">
+                    <div class="layer-header">
+                        <h3>Layer 3: TACTICAL</h3>
+                        <span class="layer-weight">Weight: 0.8</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="vector-list" id="tactical-vectors">
+                            <span class="no-data">No tactical vectors</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="layer-card" id="layer2">
+                    <div class="layer-header">
+                        <h3>Layer 2: LOCAL_AVOID</h3>
+                        <span class="layer-weight">Weight: 0.7</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="vector-list" id="avoid-vectors">
+                            <span class="no-data">No avoid vectors</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="layer-card" id="layer1">
+                    <div class="layer-header">
+                        <h3>Layer 1: PHYSICS</h3>
+                        <span class="layer-weight">Weight: 0.3</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="vector-display" id="physics-vector">
+                            <div class="vector-coords">
+                                <span>X: <span id="physics-x">1.000</span></span>
+                                <span>Y: <span id="physics-y">1.000</span></span>
+                                <span>Z: <span id="physics-z">1.000</span></span>
+                            </div>
+                            <div class="vector-info" id="physics-info">Valid directions: 8</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="layer-card final-result" id="final-layer">
+                    <div class="layer-header">
+                        <h3>✨ FINAL VECTOR</h3>
+                        <span class="layer-weight">Blended</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="vector-display" id="final-vector-display">
+                            <div class="vector-coords">
+                                <span>X: <span id="final-x">1.000</span></span>
+                                <span>Y: <span id="final-y">1.000</span></span>
+                                <span>Z: <span id="final-z">1.000</span></span>
+                            </div>
+                            <div class="vector-info" id="final-info">Moving forward</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="/static/js/layers.js"></script>
+</body>
+</html>

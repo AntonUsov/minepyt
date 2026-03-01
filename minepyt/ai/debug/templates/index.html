@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinePyt Debug Server</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🤖 MinePyt Debug</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/layers">Layers</a>
+            <a href="/sensors">Sensors</a>
+            <a href="/map">Map</a>
+            <a href="/logs">Logs</a>
+            <a href="/performance">Performance</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🤖 MinePyt AI Debug Server</h1>
+            <p>Real-time визуализация AI системы бота</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <h3>📍 Position</h3>
+                </div>
+                <div class="card-body">
+                    <div class="position-display" id="position">
+                        <span class="loading">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>❤️ Health</h3>
+                </div>
+                <div class="card-body">
+                    <div class="health-bars">
+                        <div class="health-bar">
+                            <label>Health</label>
+                            <div class="bar-container">
+                                <div class="bar health-bar-fill" id="health-bar"></div>
+                            </div>
+                            <span id="health-text">20/20</span>
+                        </div>
+                        <div class="health-bar">
+                            <label>Hunger</label>
+                            <div class="bar-container">
+                                <div class="bar hunger-bar-fill" id="hunger-bar"></div>
+                            </div>
+                            <span id="hunger-text">20/20</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>🎯 Current Task</h3>
+                </div>
+                <div class="card-body">
+                    <div class="task-display" id="task">
+                        <span class="task-name">Idle</span>
+                        <span class="task-status">No active task</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>⚡ Performance</h3>
+                </div>
+                <div class="card-body">
+                    <div class="perf-metrics" id="performance">
+                        <div class="perf-item">
+                            <span class="perf-label">Tick Time:</span>
+                            <span class="perf-value" id="tick-time">0.0 ms</span>
+                        </div>
+                        <div class="perf-item">
+                            <span class="perf-label">Memory:</span>
+                            <span class="perf-value" id="memory-usage">0.2 MB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card full-width">
+                <div class="card-header">
+                    <h3>📊 Movement Layers</h3>
+                </div>
+                <div class="card-body">
+                    <div class="layers-summary" id="layers-summary">
+                        <div class="layer-item">
+                            <span class="layer-name">Layer 4 - GOAL</span>
+                            <span class="layer-vector" id="layer4-vector">None</span>
+                        </div>
+                        <div class="layer-item">
+                            <span class="layer-name">Layer 3 - TACTICAL</span>
+                            <span class="layer-vector" id="layer3-vector">None</span>
+                        </div>
+                        <div class="layer-item">
+                            <span class="layer-name">Layer 2 - LOCAL_AVOID</span>
+                            <span class="layer-vector" id="layer2-vector">None</span>
+                        </div>
+                        <div class="layer-item">
+                            <span class="layer-name">Layer 1 - PHYSICS</span>
+                            <span class="layer-vector" id="layer1-vector">None</span>
+                        </div>
+                        <div class="layer-item final">
+                            <span class="layer-name">✨ FINAL VECTOR</span>
+                            <span class="layer-vector" id="final-vector">None</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card full-width">
+                <div class="card-header">
+                    <h3>📡 Recent Events</h3>
+                </div>
+                <div class="card-body">
+                    <div class="events-list" id="events-list">
+                        <span class="loading">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

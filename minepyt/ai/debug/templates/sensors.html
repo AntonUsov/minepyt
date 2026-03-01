@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map - MinePyt Debug</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🤖 MinePyt Debug</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/layers">Layers</a>
+            <a href="/sensors">Sensors</a>
+            <a href="/map">Map</a>
+            <a href="/logs">Logs</a>
+            <a href="/performance">Performance</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🗺 Sensors Data</h1>
+            <p>Данные сенсоров (угрозы, ресур, местность)</p>
+        </div>
+        
+        <div class="sensors-grid">
+            <div class="sensor-card">
+                <div class="sensor-header">
+                    <h3>⚠️ Threats</h3>
+                <div class="sensor-body" id="threats-body">
+                    <span class="loading">Loading...</span>
+                </div>
+            </div>
+            
+            <div class="sensor-card">
+                <div class="sensor-header">
+                    <h3>🎯 Interests</h3>
+                <div class="sensor-body" id="interests-body">
+                    <span class="loading">Loading...</span>
+                </div>
+            </div>
+            
+            <div class="sensor-card">
+                <div class="sensor-header">
+                    <h3>🏔️ Terrain</h3>
+                <div class="sensor-body" id="terrain-body">
+                    <span class="loading">Loading...</span>
+                </div>
+            </div>
+            
+            <div class="sensor-card">
+                <div class="sensor-header">
+                    <h3>👥 Players</h3>
+                <div class="sensor-body" id="players-body">
+                    <span class="loading">Loading...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card full-width">
+            <div class="card-header">
+                <h3>📊 Sensor Summary</h3>
+            </div>
+            <div class="card-body">
+                <div class="summary-stats">
+                    <div class="stat">
+                        <span class="label">Total Threats:</span>
+                        <span class="value" id="total-threats">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Total Interests:</span>
+                        <span class="value" id="total-interests">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Scan Range:</span>
+                        <span class="value" id="scan-range">16 blocks</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="/static/js/sensors.js"></script>
+</body>
+</html>

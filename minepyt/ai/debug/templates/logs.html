@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs - MinePyt Debug</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🤖 MinePyt Debug</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/layers">Layers</a>
+            <a href="/sensors">Sensors</a>
+            <a href="/map">Map</a>
+            <a href="/logs" class="active">Logs</a>
+            <a href="/performance">Performance</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📋 Event Logs</h1>
+            <p>Real-time лог событий бота</ real-time</p>
+        </div>
+        
+        <div class="logs-container" id="logs-container">
+            <div class="log-filters">
+                <button class="filter-btn active" onclick="filterLogs('info')"> filterLogs('warning')">filterLogs('error')">filterLogs('debug')</button>
+            </div>
+            
+            <div class="log-list" id="log-list">
+                <span class="no-data">No events yet</span>
+            </div>
+        </div>
+        
+        <div class="log-stats" id="log-stats">
+            <div class="stat">
+                <span>Total: <span id="log-total">0</span>
+                <span class="info-count"><span id="log-info-count">0</span>
+                <span class="warning-count"><span id="log-warning-count">0</span>
+                <span class="error-count"><span id="log-error-count">0</span>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="/static/js/logs.js"></script>
+</body>
+</html>

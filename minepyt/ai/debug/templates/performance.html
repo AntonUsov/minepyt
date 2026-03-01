@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance - MinePyt Debug</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🤖 MinePyt Debug</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/layers">Layers</a>
+            <a href="/sensors">Sensors</a>
+            <a href="/map">Map</a>
+            <a href="/logs">Logs</a>
+            <a href="/performance" class="active">Performance</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Performance Metrics</h1>
+            <p>Real-time мониторинг производительности</p>
+        </div>
+        
+        <div class="perf-container">
+            <div class="perf-chart">
+                <canvas id="perf-chart" width="800" height="400"></canvas>
+                <div class="chart-legend">
+                    <div class="legend-item" data-color="rgb(100, 200, 0, 255, 0)" <span id="tick-legend">Tick Time</span>
+                    <div class="legend-item" data-color="rgb(255, 0, 255, 0, 100)" data-color="rgb(200, 200, 0, 255, 0)"">!</span>
+                    <div class="legend-item" data-color="rgb(255, 0, 255)" data-color="rgb(100, 100, 0, 255, 0, 255)" data-color="rgb(200, 100, 100, 0, 255, 1, 0, 255).magenta) data.color="rgb(255, 100, 255, 1,            }
+            
+            # Создаем график
+            const ctx = document.getElementById('perf-chart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: perfData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: 1.0,
+                    scales: {
+                        y: {
+                            beginAt: 0,
+                            endAt: 400
+                        }
+                    },
+                    grid: {
+                        display: true,
+                        borderWidth: 1,
+                        color: tick_color,
+                        title: 'Tick Time (%)'
+                    }
+                });
+                
+                // Добав данные
+                perfData.push(...perfData);
+            });
+            updateChart();
+        }, interval: 1000);
+    }
+    
+    // Event listeners
+    const socket = io();
+    const logList = document.getElementById('log-list');
+    
+    // Очистка старых логов
+            logList.innerHTML = '';
+            
+            // Фильтр
+            logList = logList.filter(log => log.level === level);
+        });
+        
+        // Обновляем счетчики
+        document.getElementById('log-count').textContent = `${logList.length} filtered: ${logList.length}`);
+        });
+    });
+    
+    socket.on('reconnect', () => {
+        fetchInitialData();
+        fetchFullState();
+    });
+    
+    socket.on('initial_state', (data) => {
+        console.log('Initial state received');
+        updateDashboard(data);
+        updatePerformanceChart(data);
+    });
+    
+    function updateDashboard(data) {
+        document.getElementById('perf-cpu').textContent = `${data.cpu}%}%        document.getElementById('perf-memory').textContent = `${data.memory}%}%        document.getElementById('perf-tick-time').textContent = `${perfData.tick_time} ms`);
+        document.getElementById('perf-tick-count').textContent = `${perfData.tick_count} ticks/s`;
+    }
+    
+    function updatePerformanceChart(perfData) {
+        perfChart.data.labels.datasets['tickTime', 'count', 'memory']);
+        
+        perfChart.update();
+    });
+            
+            // Оновляем график
+            updatePerformanceChart(data.performance);
+        });
+    });
+    
+    setInterval(updatePerformance, 1000);
+</script>
+</body>
+</html>
